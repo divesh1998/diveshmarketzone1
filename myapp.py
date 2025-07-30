@@ -4,8 +4,8 @@ import plotly.graph_objects as go
 
 # Configuration
 symbol = "BTC-USD"  # You can change to "GC=F" for Gold
-interval = "1h"     # You can use '1m', '5m', '15m', '1h', '1d'
-period = "5d"       # Data period to fetch
+interval = "1h"
+period = "5d"
 
 def fetch_data():
     df = yf.download(symbol, period=period, interval=interval)
@@ -18,7 +18,7 @@ def draw_levels(df):
     return float(support), float(resistance)
 
 def detect_candle(df):
-    last = df.iloc[[-1]]  # Ensure it stays as DataFrame
+    last = df.iloc[[-1]]
     open_price = float(last['Open'].iloc[0])
     close_price = float(last['Close'].iloc[0])
     if close_price > open_price:
@@ -40,6 +40,13 @@ def main():
     st.set_page_config(page_title="Divesh Market Zone", layout="wide")
     st.title("📊 Divesh Market Zone - Live BTC/Gold Signal App")
 
+    # 📤 Upload Image Section
+    st.header("📤 Upload Chart Image")
+    uploaded_file = st.file_uploader("Upload your technical setup image", type=["jpg", "png", "jpeg"])
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Chart", use_column_width=True)
+
+    # 📈 Live Data & Signal
     df = fetch_data()
     support, resistance = draw_levels(df)
     candle_type = detect_candle(df)
@@ -53,6 +60,7 @@ def main():
     st.write(f"💰 **Last Close**: `{close}`")
     st.success(f"📣 **Signal**: {signal}")
 
+    # 📊 Chart
     fig = go.Figure(data=[go.Candlestick(
         x=df.index,
         open=df['Open'],
@@ -60,7 +68,6 @@ def main():
         low=df['Low'],
         close=df['Close']
     )])
-
     fig.add_hline(y=support, line_dash="dot", line_color="green")
     fig.add_hline(y=resistance, line_dash="dot", line_color="red")
     fig.update_layout(title="Live Candlestick Chart", xaxis_rangeslider_visible=False)
